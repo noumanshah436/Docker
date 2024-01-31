@@ -1,0 +1,8 @@
+sudo tar -C /usr/local -xzf go1.21.3.linux-amd64.tar.gz
+
+$ export PATH=$PATH:/usr/local/go/bin   (just add it in zshrc and run source)
+$ go version
+
+go version go1.21.3 linux/amd64
+$ export GOPATH=$PWD/go-workspace
+$

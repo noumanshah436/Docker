@@ -1,0 +1,27 @@
+
+steps to follow:
+1) copy Dockerfile from "06-building-container-images/api-node" to "05-example-web-application/api-node"
+2) cd "05-example-web-application/api-node"
+3) and build the image using that docker-file
+
+-> Build docker file in the current directory:
+$ docker build .
+
+-> Also add a tag to that image
+$ docker build -t api-node:0 .
+
+List all images:
+$ docker image ls
+
+
+
+WORKDIR:
+Set the working directory for any subsequent ADD, COPY, CMD, ENTRYPOINT, or RUN instructions that follow it in the Dockerfile.
+
+****************************
+
+same as for api-node, copy docker file for react app and run
+
+docker build -t client-react:0 .
+
+****************************

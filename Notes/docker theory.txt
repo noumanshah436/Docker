@@ -1,0 +1,91 @@
+
+
+Hypervisor = run different OS
+
+VirtualBox
+VMware
+Hyper-v ( Windows only )
+
+********************
+
+OS kernal control resources of computer used by different applications ( chrome , notepad , )
+
+********************
+
+namespacing  = isolation of resources by process ( hr process k liye alag resource)
+
+control groups =  Limit resources per process
+
+docker facilitates in namespacing and control groups.
+
+container is a process with limited isolated resources.
+
+********************
+
+
+image has two things:
+
+1) file system snapshot  ==
+2) startup command   ==
+
+docker put file system snapshot in hard-disk and use startup command to start container.
+
+
+********************
+
+
+Images:
+- Docker images are blueprints for creating containers 
+- Containing everything needed to run an application.
+
+
+container:
+- container is a running environment of an image
+- Docker containers are instances of Docker images created and run using the Docker engin
+
+
+********************
+
+docker host or docker engine:
+
+The underlying host where docker is installed is called docker host or docker engine.
+
+Every docker container assigned an IP by defalt.
+
+********************
+
+
+docker file:
+
+Docker can build images automatically by reading the instructions from a Dockerfile .
+A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image.
+
+********************
+
+docker-compose is used to run multi container application automatically.
+
+Docker Compose is a tool that was developed to help define and share multi-container applications.
+With Compose, we can create a YAML file to define the services and with a single command, can spin everything up or tear it all down.
+
+********************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

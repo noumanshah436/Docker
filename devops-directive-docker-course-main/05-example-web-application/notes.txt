@@ -1,0 +1,72 @@
+
+Make the whole stack of apps work together:
+
+
+cd /home/dev/My-Data/devops-directive-docker-course-main/05-example-web-application
+
+1) make run-postgres
+
+2) install node modules in node project using `npm install` and then run
+
+make run-api-node
+
+check: http://localhost:3000/
+
+3) make run-api-golang
+
+check: http://localhost:8080/
+
+4) make run-client-react
+
+check: http://localhost:5173/
+
+************************************************************
+
+Error:
+docker: Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:5432 -> 0.0.0.0:0: listen tcp 0.0.0.0:5432: bind: address already in use.
+
+$ sudo lsof -i :5432
+
+$ sudo kill pid
+
+
+The lsof command is used to list open files, and when used with the -i flag followed by a port number,
+it shows information about processes that are using that port.
+
+However, if you're getting no output from this command, it means that there is no process currently using port 5432 on your system.
+
+***************************
+
+-docker run \
+		-e POSTGRES_PASSWORD=foobarbaz \
+		-v pgdata:/var/lib/postgresql/data \
+		-p 5432:5432 \
+		postgres:15.1-alpine
+
+I have created docker postgress image
+from where i can acces my database?
+
+Answer:
+
+1) sudo apt-get install postgresql-client
+
+2) psql -h localhost -p 5432 -U postgres -d postgres -W
+
+-h: Hostname (use localhost if connecting to the local machine).
+-p: Port (use 5432 for the default PostgreSQL port).
+-U: User (use postgres for the default PostgreSQL superuser).
+-d: Database (use postgres for the default PostgreSQL database).
+-W: Prompt for password.
+
+-> After successfully connecting, you can interact with the PostgreSQL server using SQL commands. For example:
+SELECT version();
+
+-> Once connected, you can list the databases using the \l command:
+
+\l
+
+-> To exit the psql terminal, you can type:
+
+\q
+
+***************************

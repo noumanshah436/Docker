@@ -1,0 +1,71 @@
+psql --version
+
+
+docker run postgres:9.6
+docker run postgres:10.10
+
+docker ps     ( list of all containers)
+
+
+sudo apt  install docker.io
+
+docker --version
+
+sudo systemctl status docker
+sudo systemctl enable --now docker
+
+
+****************************
+
+
+https://docs.docker.com/desktop/install/ubuntu/
+
+setup credentials:
+
+https://docs.docker.com/desktop/get-started/#credentials-management-for-linux-users
+
+
+
+add user ( sudo error)
+https://docs.docker.com/engine/install/linux-postinstall/
+
+****************************
+
+docker compose not found error:
+
+https://phoenixnap.com/kb/install-docker-compose-on-ubuntu-20-04
+
+
+***********************
+
+versions check:
+
+docker compose version
+docker --version
+docker version
+
+****************************
+
+remove all containers:
+docker container rm -f $(docker container ls -aq)
+
+remove all images:
+docker image rm -f $(docker image ls -aq)
+
+show only id's of all images:
+docker image ls -aq
+
+-a  == to bring stopped container as well
+-q  == show only id
+-f  == force run
+
+
+*******************************
+To delete all containers including its volumes use,
+
+docker rm -vf $(docker ps -aq)
+To delete all the images,
+
+docker rmi -f $(docker images -aq)
+Remember, you should remove all the containers before removing all the images from which those containers were created.
+*******************************

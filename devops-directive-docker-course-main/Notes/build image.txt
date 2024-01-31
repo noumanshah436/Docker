@@ -1,0 +1,34 @@
+
+docker build commad syntax:
+
+docker build -t <IMAGE_NAME> -f <DOCKERFILE_PATH> <BUILD_CONTEXT>
+
+<IMAGE_NAME>: The desired name and optionally a tag for the Docker image.
+
+<DOCKERFILE_PATH>: The path to the Dockerfile you want to use. You can specify an absolute path or a relative path from the current directory.
+
+<BUILD_CONTEXT>: The path to the directory containing the build context and related files.
+
+
+Example:
+
+Suppose you have a Dockerfile with a custom name, such as "Dockerfile.example," and you want to build an image using this Dockerfile:
+
+docker build -t my-image -f Dockerfile.example .
+
+In this example:
+
+1) -t my-image specifies the name and optionally a tag for the Docker image as "my-image."
+
+2) -f Dockerfile.example tells Docker to use the "Dockerfile.example" as the Dockerfile for the build.
+
+3) . specifies the build context, which is the current directory. The Dockerfile and other necessary files referenced in the Dockerfile should be present in this context.
+
+
+Using the -f option is particularly useful when you have multiple Dockerfiles in a project,
+ and you want to select a specific one for a particular image build.
+
+
+
+
+

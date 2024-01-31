@@ -1,0 +1,11 @@
+FROM node
+# above is same as
+# FROM node:latest
+
+
+# copy the entire current directory into the image
+COPY . .
+
+RUN npm install
+
+CMD [ "node", "index.js" ]

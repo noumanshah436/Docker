@@ -1,0 +1,222 @@
+
+
+
+***************************
+check docker installation
+
+docker run hello-world
+
+or
+
+sudo docker run hello-world
+
+******************************
+
+Some basics Docker Commands
+
+
+• Starting up your project
+  sudo docker compose up –build
+
+• Shutting down project
+  sudo docker compose down
+
+• Shutting down and clearing database
+  sudo odcker compose down –volumes
+
+• docker help
+      docker –help
+
+************************
+
+pulls the docker image from repositior to local environment
+
+* docker pull redis
+
+*******
+
+* docker images
+
+*******
+
+now to run redis we need to have container from redis image that will make possible to connect to redis application
+
+this will start image in container
+* docker run redis
+
+*******
+
+* docker ps  = list running containers
+
+*******
+
+* docker run = pull and starts new container
+*******
+
+* docker run -d redis
+
+this will give the id of the conatiner
+run docker in a detached mode
+
+***************
+remove a container:
+
+docker rm <id or name of container>
+
+***************
+
+restart container
+
+docker stop <id_of_container>                ---- we can also use name of the container
+docker start <id_of_container>
+
+***************
+
+docker ps -a    = lists running and stopped container
+
+***************
+
+to run different versions of redis for two different applications
+
+docker run redis:4.0   -- pull image and starts container
+
+
+***************
+
+binding container and host
+
+Container can run on same port but we should have host bingding port different
+
+docker run -p6000:6379 redis
+
+docker run -p6000:6379 -d redis
+docker run -p6001:6379 -d redis:4.0
+
+-phost_post:container_port
+
+
+It connects my localhost(my-system) port 6000  to the  port 6379 inside my container
+
+******************************
+
+Debugging container
+
+1)
+* docker logs <id_of_container>
+* docker logs <id_of_container> | tail            -- to see last part of logs only
+* docker logs <id_of_container> -f           -- now you can string the logs ( add line manualy to separate )
+
+2)
+create a new container with given name
+
+docker run -d -p6001:6379 --name redis-older redis:4.0
+docker run -d -p6000:6379 --name redis-latest redis
+
+docker logs redis-older
+
+***************
+Check the virtual file system or configurations of the container
+
+* docker exec -it <id_of_container> /bin/bash          -- it for interactive terminal
+* ls
+* cd /
+* ls
+* env
+
+*********************************
+
+
+docker network ls
+
+docker pull mongo
+docker pull mongo-express
+
+docker netword create mongo-network
+
+*********************************
+
+docker-compose up
+
+*********************************
+
+docker file is a blueprint for creating docker images.
+
+RUN - execute any linux Command
+
+RUN mkdir -p /home/app
+this directory is created inside of the container and not on the laptop( host )
+
+COPY . /home/app
+copy files on my host inside of the container image
+COPY - executes on Host machine
+
+*********************************
+
+remove container
+
+1) docker ps  and grab the id
+2) docker rm <container_id>
+
+3) docker images
+4) docker rmi <image_id>
+
+
+
+****************************
+
+
+push repositior
+
+
+
+docker tag local-image:tagname new-repo:tagname
+docker push new-repo:tagname
+
+docker push syednouman/instagram-clone:tagname
+
+****************************
+
+REPOSITORY            TAG       IMAGE ID       CREATED         SIZE
+instagram-clone-app   latest    dcf66253536a   5 minutes ago   641MB
+busybox               latest    334e4a014c81   12 hours ago    4.86MB
+redis                 latest    3e12e2ceb68f   31 hours ago    117MB
+postgres              alpine    9104349146d9   6 days ago      243MB
+hello-world           latest    feb5d9fea6a5   14 months ago   13.3kB
+redis                 4.0       191c4017dcdd   2 years ago     89.3MB
+
+
+docker tag instagram-clone-app:latest syednouman/instagram-clone
+docker push syednouman/instagram-clone
+
+
+
+https://hub.docker.com/r/syednouman/instagram-clone
+
+****************************
+https://www.youtube.com/watch?v=EIHY_CY5J0k
+
+to Pull and run :
+
+docker pull syednouman/instagram-clone
+docker run -p 3000:3000 syednouman/instagram-clone
+
+docker run -p 3002:3000 syednouman/instagram-clone
+
+
+0d6a5b1ff2a9   instagram-clone-app   "entrypoint.sh rails…"   35 minutes ago   Up 35 minutes   0.0.0.0:3000->3000/tcp, :::3000->3000/tcp   instagram-clone-app-1
+9c863bdd2473   postgres:alpine       "docker-entrypoint.s…"   35 minutes ago   Up 35 minutes   0.0.0.0:3001->5432/tcp, :::3001->5432/tcp   instagram-clone-db-1
+
+
+************************
+
+stop redis server:
+
+/etc/init.d/redis-server stop
+
+
+************************
+
+
+docker compose down --remove-orphans
+
+https://stackoverflow.com/questions/73948802/strconv-atoi-parsing-invalid-syntax

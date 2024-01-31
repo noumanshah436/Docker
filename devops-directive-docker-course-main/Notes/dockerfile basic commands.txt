@@ -1,0 +1,330 @@
+
+Dockerfile reference
+https://docs.docker.com/engine/reference/builder/
+
+
+A Dockerfile is a text file that contains a set of instructions for building a Docker image. These instructions define how to create an image by specifying the base image, adding files, setting environment variables, and more. Here are some of the common commands used in a Dockerfile:
+
+Most used commands are:
+FROM
+MAINTAINER
+RUN
+COPY
+ADD
+WORKDIR
+ENV
+EXPOSE
+CMD
+ENTRYPOINT
+USER
+VOLUME
+LABEL
+ARG
+
+********************************************************************
+
+FROM:
+This is the first instruction in a Dockerfile and specifies the base image to use.
+
+For example, FROM ubuntu:20.04 sets the base image as Ubuntu 20.04.
+
+Explanation:
+Specifies the base image for your Docker image. All other instructions in your Dockerfile are built on top of this base image.
+
+
+Examples:
+Using an official Ubuntu image as a base:
+
+FROM ubuntu:20.04
+
+Using a Node.js image as a base:
+
+FROM node:14
+
+Using a Python image as a base:
+
+FROM python:3.9
+
+********************************************************************
+
+MAINTAINER: This instruction is used to specify the name and email address of the image's maintainer. It's not mandatory, but it provides information about the image's creator.
+
+
+********************************************************************
+
+RUN:
+The RUN command is used to execute commands within the image.
+
+Explanation: Executes commands during the image build process. These commands are run in the image and can be used to install software or perform setup tasks.
+
+Examples:
+Updating package repositories and installing software:
+
+
+RUN apt-get update && apt-get install -y software-package
+
+
+Cloning a Git repository and building an application:
+
+
+RUN git clone https://github.com/user/repo.git && cd repo && make
+
+Running a Python script:
+
+
+RUN python script.py
+
+********************************************************************
+
+COPY:
+
+COPY is used to copy files or directories from the host machine into the image.
+
+For example,
+COPY ./source /destination copies files from the source directory on the host to the destination directory in the image.
+
+Explanation: Copies files or directories from the host machine to the image.
+
+Examples:
+Copying a local file to the image:
+COPY local-file.txt /app/
+
+Copying a directory from the host to a directory in the image:
+COPY ./source-directory /destination-directory
+
+
+Copying multiple files:
+COPY file1.txt file2.txt /app/
+
+
+********************************************************************
+
+ADD:
+Similar to COPY, the ADD command is used to copy files and directories from the host machine into the image,
+ but it has additional features, such as the ability to fetch remote URLs and extract compressed files.
+
+Example 1: Copy a local file to the image:
+
+# Use a base image
+FROM ubuntu:20.04
+
+# Copy a local file from the host to the image
+ADD local-file.txt /app/
+
+In this example, the local-file.txt from the host machine is copied into the /app/ directory within the Docker image.
+
+*****************
+Example 2: Copy a directory from the host to the image:
+
+# Use a base image
+FROM nginx:latest
+
+# Copy a directory from the host to the image
+ADD ./my-website /usr/share/nginx/html/
+
+In this case, the my-website directory from the host is copied into the /usr/share/nginx/html/ directory within the Nginx-based Docker image.
+This can be used to add web content to a web server image.
+
+*****************
+
+Example 3: Fetch a remote file and extract it:
+
+# Use a base image
+FROM alpine:3.14
+
+# Fetch a remote tar.gz file and extract it in the image
+ADD https://example.com/my-archive.tar.gz /tmp/
+RUN tar -xvzf /tmp/my-archive.tar.gz -C /app/
+
+
+In this example, a remote my-archive.tar.gz file is fetched and extracted in the /app/ directory within the Docker image.
+The RUN command is used to extract the file using the tar utility.
+
+********************************************************************
+
+WORKDIR:
+
+This sets the working directory for any RUN, CMD, ENTRYPOINT, COPY, and ADD instructions that follow in the Dockerfile.
+
+
+********************************************************************
+
+ENV: ENV is used to set environment variables in the image.
+
+Explanation: Sets environment variables in the image, which can be used by applications and scripts within the container.
+
+Examples:
+Setting an environment variable for a database connection:
+ENV DB_HOST=localhost
+
+Defining an environment variable for a web server port:
+ENV PORT=8080
+
+
+Specifying multiple environment variables:
+ENV API_KEY=your_api_key
+ENV SECRET_KEY=your_secret_key
+
+********************************************************************
+
+EXPOSE: It informs Docker that the container listens on specific network ports at runtime. For example, EXPOSE 80 declares that the container listens on port 80.
+
+
+********************************************************************
+
+CMD:
+The CMD instruction specifies the default command to run when a container starts.
+You can use it to provide a command and its arguments, which can be overridden when starting a container.
+
+
+Examples:
+Running a Node.js application:
+
+
+CMD ["node", "app.js"]
+
+
+Starting a web server:
+
+
+CMD ["nginx", "-g", "daemon off;"]
+
+
+Running a custom shell script:
+
+
+CMD ["./startup.sh"]
+
+********************************************************************
+
+ENTRYPOINT: Similar to CMD, but the command and its arguments defined in ENTRYPOINT are not easily overridden. It's used to define the primary command for the container.
+
+
+********************************************************************
+
+USER:
+
+The USER command in a Dockerfile is used to specify the user or UID (User Identifier) that the image should run as when a container is started from that image.
+It allows you to set the user context for the running process inside the container.
+By default, many Docker images run processes as the root user, but it's considered a best practice to run containers with non-root users for security and isolation reasons.
+
+Here's a more detailed explanation and an example of the USER command:
+
+Explanation:
+
+- When you set a user using the USER command, any commands executed in the Dockerfile after this point and any commands run when the container starts will be run with the permissions of that user.
+
+- It helps improve security by reducing the potential impact of security vulnerabilities or malicious code running within the container.
+
+Example:
+Let's say you have a simple Dockerfile for a Python application, and you want to run the application as a non-root user for security reasons:
+
+Dockerfile:  *********************
+
+# Use an official Python image as the base
+FROM python:3.9
+
+# Create a non-root user named "myappuser" with UID 1000
+RUN useradd -u 1000 myappuser
+
+# Set the working directory and copy your application files
+WORKDIR /app
+COPY . .
+
+# Install application dependencies
+RUN pip install -r requirements.txt
+
+# Switch to the "myappuser" user
+USER myappuser
+
+# Define the command to run when the container starts
+CMD ["python", "app.py"]
+
+Dockerfile:  *********************
+
+In this example:
+
+We start with an official Python image as the base image.
+We create a non-root user named "myappuser" with a specific UID (1000) using the useradd command.
+We set the working directory, copy the application files, and install dependencies.
+We switch to the "myappuser" using the USER command, so the application process runs as this non-root user.
+Finally, we specify the default command to run when the container starts, which is your Python application in this case.
+By setting a non-root user with a specific UID, you enhance the security of your container, as it limits the potential damage that could be caused by any security vulnerabilities in your application.
+
+********************************************************************
+
+VOLUME:
+It creates a mount point with the specified name and marks it as holding externally mounted volumes from the native host or other containers.
+
+Example 1 - Basic Volume:
+
+# Create a volume for a data directory
+VOLUME /data
+Explanation: This command creates a named volume in the container for the /data directory. It allows you to persist data outside the container, even if the container is stopped or removed.
+
+*****************************
+
+Example 2 - Named Volume:
+
+# Create a named volume with a specific name
+VOLUME my_data_volume:/app/data
+
+Explanation: This creates a named volume with the name my_data_volume that is mounted at the /app/data directory in the container. Named volumes are reusable across containers.
+
+*****************************
+
+Example 3 - Anonymous Volume:
+
+# Create an anonymous (unamed) volume
+VOLUME /var/log
+
+Explanation: An anonymous volume is created for the /var/log directory, and Docker assigns a unique name to it. These volumes are typically used for temporary data.
+
+********************************************************************
+
+LABEL:
+Labels are key-value metadata pairs that can be added to images for documentation or organization purposes.
+
+
+Example 1 - Simple Label:
+
+# Add a simple label to the image
+LABEL version="1.0"
+
+Explanation: This adds a label to the Docker image with the key "version" and the value "1.0." Labels are used for metadata and can provide information about the image.
+
+***************
+
+
+Example 2 - Multiple Labels:
+
+# Add multiple labels to the image
+LABEL author="John Doe" description="My custom image" release-date="2023-10-20"
+
+Explanation: You can add multiple labels to an image, providing additional information about the image, such as the author, description, and release date.
+
+********************************************************************
+
+ARG:
+
+ARG allows you to declare variables that users can pass at build-time to the builder with the docker build command.
+
+
+Example 1 - Basic ARG:
+
+# Define a build-time argument
+
+ARG APP_VERSION=latest
+RUN echo "Building version $APP_VERSION"
+
+
+Explanation:
+ This defines a build-time argument APP_VERSION with a default value of "latest."
+ You can pass a different value when building the image using the --build-arg option.
+
+docker build --build-arg APP_VERSION=2.0 -t my-image  .
+
+
+********************************************************************
+
+

@@ -1,0 +1,167 @@
+docker login
+
+
+*******************
+
+docker build -t hello-docker .
+
+docker image ls
+
+docker run hello-docker
+
+******************
+we can  specify starting chars of id that are differnt from others
+
+******************
+
+package manager:
+docker use apt as a package manager
+
+
+*******************
+
+append a Command
+docker run ubuntu sleep 5
+
+*******************
+
+execute command on running conatiner
+
+docker exec cat hello.txt
+
+*******************
+
+Run - attach and detached
+
+docker run redis
+******
+
+* docker run -d redis
+run container in background
+
+* docker attach <id_of_container>
+attch to the detach container
+
+*******************
+
+docker run redis
+
+docker run redis:4.0
+
+4.0 is the tag
+By default the tag is "latest" which is accociated with the latest version of image
+
+*******************
+
+docker standard input
+
+docker run image_name
+
+By default docker container do not listen to the standard input
+It does not have the terminal to read inputs from you
+
+To provide tour input you must map the standard input of your host to the docker container using '-i' parameter
+we also need '-t' parameter for application to propmt on the terminal
+
+docker run -it image_name
+
+*******************
+rails…see details of a container in a json format
+
+docker inspect <id_of container>
+
+*******************
+
+docker logs <id_of container>
+
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+
+*******************
+

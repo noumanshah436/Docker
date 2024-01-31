@@ -1,0 +1,19 @@
+
+docker-compose is used for multi container application.
+
+
+Docker compose rails:
+
+https://github.com/docker/awesome-compose/tree/master/official-documentation-samples/rails/
+
+****************************
+
+For comples application running multiple services we have to use docker-compose instead of docker run
+
+For this we will create configuration file docker-compose.yml file and put togethor different services
+and the  options specific to this
+
+and then run "docker compose up" to bring up the entire application stack.
+
+
+

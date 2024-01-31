@@ -1,0 +1,155 @@
+
+Docker file systems are temporary by default. If you start up a Docker image you'll get a container that on the surface behaves much like a virtual machine. 
+
+You can create, modify, and delete files. However, unlike a virtual machine,
+ 
+if you stop the container and start it up again, all your changes will be lost ---- any files you previously deleted
+
+will now be back, and any new files or edits you made won't be present.
+
+Volumes in docker containers allow for persistent data, and for sharing host-machine data inside a container.
+
+
+persistent data refers to data that is stored outside of a container's file system and is maintained across container restarts, upgrades, or changes. When a container is stopped or removed, all the data stored inside its file system is lost. However, by using persistent data, we can ensure that certain data or configurations are preserved and are available to other containers or applications that may need them.
+
+
+
+
+**************************************
+
+
+What is Docker Volume?
+
+ In order to be able to save data and also to share data between containers, Docker came up with the concept of volumes.
+ Volumes are directories (or files) that are outside of the default Union File System and exist as normal directories and files on the host filesystem.
+
+- share data with different containers using volumes.
+- volumes are actually are directories that exists on host system ( separate from image )
+
+
+**************************************
+
+volume types:
+https://www.youtube.com/watch?v=bsHjHojHNf8&t=6s
+
+
+bind mount: 
+In this type we mount our host directory with container.
+We can bind this directory with multiple containers.
+
+create volume:
+WE create a separate volune using docker create command ad bound this volume with the container
+
+***
+
+Host-mounted volumes - This type of volume mounts a directory from the host machine into the container. Host-mounted volumes are useful for sharing data between the container and the host machine, or for persisting data across container restarts or upgrades.
+
+Syntax:   
+docker run -v /path/on/host:/path/in/container IMAGE_NAME
+
+docker run -v /path/on/host:/usr/share/nginx/html:ro -p 8080:80 nginx
+
+
+
+Named volumes - This type of volume is created and managed by Docker, and is associated with a specific container or service. Named volumes are useful for persisting data across container restarts or upgrades, and can be shared across multiple containers or services.
+This means that the data is stored within Docker's internal storage system and is not tied to the host's file system
+
+Syntax:  docker volume create my-db
+docker run -v VOLUME_NAME:/path/in/container IMAGE_NAME
+
+docker run -v my-db-data:/var/lib/postgresql/data postgres
+
+********************
+
+key difference between Host-mounted volumes and named volume
+
+
+
+In summary, host-mounted volumes offer greater control and flexibility, but are less portable, 
+
+while named volumes offer higher portability and ease of management, but are less flexible
+
+
+**************************************
+
+
+docker volume create my-db
+docker run -v VOLUME_NAME:/path/in/container IMAGE_NAME
+
+docker run -v my-db-data:/var/lib/postgresql/data postgres
+
+
+
+why docker volumes:
+
+Persistence
+Data sharing
+Backup and restore
+
+
+
+sharing examples:
+
+Sharing configuration files: In a complex application, there may be multiple containers that need access to the same configuration files. By using a Docker volume to share these files, you can ensure that all containers have access to the same configuration data, which can help to avoid inconsistencies and ensure that the application works as intended.
+
+Sharing data between microservices: In a microservices architecture, there may be multiple services that need to share data with each other. By using a Docker volume to share data between containers, you can ensure that all services have access to the same data, which can help to improve the reliability and consistency of the application.
+
+Sharing data between developers: In a team environment, multiple developers may be working on the same application or project. By using a Docker volume to share data between containers, you can ensure that all developers have access to the same data and can work on the same codebase, which can help to improve collaboration and reduce the risk of conflicts or errors.
+
+
+
+
+
+
+
+
+
+
+Portability: By storing data in Docker volumes rather than in the container file system, you can make your containers more portable. This means that you can easily move your containers from one host to another without losing any data.
+
+Scalability: When you need to scale an application horizontally (i.e., add more instances of the same container), Docker volumes can help ensure that all instances have access to the same data. This can help to prevent data inconsistencies and ensure that the application functions correctly as it scales.
+
+Performance: Storing data in Docker volumes can be faster than storing it in the container file system, especially for applications that generate large amounts of data. This is because the data can be stored on the host file system, which is typically faster and more efficient than the container file system.
+
+Security: Storing sensitive data (such as database passwords or API keys) in Docker volumes can be more secure than storing it in the container file system. This is because volumes can be encrypted and accessed only by authorized users, whereas data stored in the container file system may be more vulnerable to attacks or unauthorized access.
+
+
+
+
+
+
+***************************
+
+What we can share between containers:
+
+Here are some keywords for data that can be shared between Docker containers:
+
+Configuration files: Configuration files contain settings and parameters for applications and services. By sharing configuration files between containers, we can ensure that they have the same configuration and behavior.
+
+Application code: Application code is the set of instructions that tells the computer what to do. By sharing application code between containers, we can ensure that they have the same functionality and features.
+
+Libraries: Libraries are collections of pre-written code that can be used by applications to perform specific tasks. By sharing libraries between containers, we can reduce the amount of disk space and memory used by multiple containers.
+
+Dependencies: Dependencies are software components that an application or service needs to function correctly. By sharing dependencies between containers, we can reduce the amount of time and effort required to set up and configure containers.
+
+Databases: Databases are collections of data organized in a structured way. By sharing databases between containers, we can ensure that they have access to the same data and that changes made by one container are reflected in others.
+
+Log files: Log files contain information about the operation and performance of applications and services. By sharing log files between containers, we can centralize the monitoring and troubleshooting of multiple containers.
+
+Network resources: Network resources include IP addresses, ports, and other network-related configurations. By sharing network resources between containers, we can ensure that they have the same network connectivity and access to external resources.
+
+By sharing these types of data between containers, we can create more efficient and scalable containerized applications that are easier to manage and maintain.
+
+***************************
+
+
+
+
+
+
+
+
+
+
+
+
