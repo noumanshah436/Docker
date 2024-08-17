@@ -1,18 +1,5 @@
 
-
-
-***************************
-check docker installation
-
-docker run hello-world
-
-or
-
-sudo docker run hello-world
-
-******************************
-
-Some basics Docker Commands
+Some basics Docker compose Commands
 
 
 • Starting up your project
@@ -27,101 +14,6 @@ Some basics Docker Commands
 • docker help
       docker –help
 
-************************
-
-pulls the docker image from repositior to local environment
-
-* docker pull redis
-
-*******
-
-* docker images
-
-*******
-
-now to run redis we need to have container from redis image that will make possible to connect to redis application
-
-this will start image in container
-* docker run redis
-
-*******
-
-* docker ps  = list running containers
-
-*******
-
-* docker run = pull and starts new container
-*******
-
-* docker run -d redis
-
-this will give the id of the conatiner
-run docker in a detached mode
-
-***************
-remove a container:
-
-docker rm <id or name of container>
-
-***************
-
-restart container
-
-docker stop <id_of_container>                ---- we can also use name of the container
-docker start <id_of_container>
-
-***************
-
-docker ps -a    = lists running and stopped container
-
-***************
-
-to run different versions of redis for two different applications
-
-docker run redis:4.0   -- pull image and starts container
-
-
-***************
-
-binding container and host
-
-Container can run on same port but we should have host bingding port different
-
-docker run -p6000:6379 redis
-
-docker run -p6000:6379 -d redis
-docker run -p6001:6379 -d redis:4.0
-
--phost_post:container_port
-
-
-It connects my localhost(my-system) port 6000  to the  port 6379 inside my container
-
-******************************
-
-Debugging container
-
-1)
-* docker logs <id_of_container>
-* docker logs <id_of_container> | tail            -- to see last part of logs only
-* docker logs <id_of_container> -f           -- now you can string the logs ( add line manualy to separate )
-
-2)
-create a new container with given name
-
-docker run -d -p6001:6379 --name redis-older redis:4.0
-docker run -d -p6000:6379 --name redis-latest redis
-
-docker logs redis-older
-
-***************
-Check the virtual file system or configurations of the container
-
-* docker exec -it <id_of_container> /bin/bash          -- it for interactive terminal
-* ls
-* cd /
-* ls
-* env
 
 *********************************
 
@@ -152,22 +44,7 @@ COPY - executes on Host machine
 
 *********************************
 
-remove container
-
-1) docker ps  and grab the id
-2) docker rm <container_id>
-
-3) docker images
-4) docker rmi <image_id>
-
-
-
-****************************
-
-
 push repositior
-
-
 
 docker tag local-image:tagname new-repo:tagname
 docker push new-repo:tagname

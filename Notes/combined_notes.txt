@@ -1,0 +1,460 @@
+
+Topics:
+
+Links
+Check docker installation
+docker pull
+docker images
+docker ps
+docker run
+docker exec 
+Restart container
+Remove container
+Remove image
+Remove all stopped containers
+Environment Variabel in mysql container
+Exposing Port 
+Debugging container
+
+======================================================================================
+Links:
+
+
+https://docs.docker.com/reference/cli/docker/image/ls/
+
+
+https://www.youtube.com/watch?v=Qn08jgrsRY4&list=PLbGui_ZYuhihMb5pqut64GhW-WhxKpygY&index=5&t=2448s
+1:003
+
+======================================================================================
+
+Check docker installation:
+
+docker run hello-world
+
+or
+
+sudo docker run hello-world
+
+
+======================================================================================
+
+docker pull:
+
+
+Pulls the docker image from repositior to local environment
+$ docker pull python
+
+Pull docker image with specific tag:
+$ docker pull python:3.9-slim
+
+
+docker pull images in layers so that if we want to pull any other image, 
+it will then only pull layers that are not downloaded before.
+
+Docker optimizes image downloads by pulling layers individually. 
+If you pull a new image that shares some layers with previously downloaded images, Docker only pulls the layers that aren't already available locally. 
+This is a significant advantage because it reduces bandwidth usage and speeds up the download process.
+
+======================================================================================
+
+docker images:
+show all images 
+
+$ docker images
+REPOSITORY    TAG        IMAGE ID       CREATED         SIZE
+python        3.9-slim   d8892906392f   2 weeks ago     125MB
+
+======================================================================================
+
+docker ps:
+
+$ docker ps
+list running containers
+
+$ docker ps -a  
+lists both running and stopped container
+
+CONTAINER ID   IMAGE             COMMAND     CREATED       STATUS                   PORTS     NAMES
+38c732292291   python:3.9-slim   "python3"   2 hours ago   Exited (0) 2 hours ago             python-c1
+973a3e5ef556   hello-world       "/hello"    2 hours ago   Exited (0) 2 hours ago             lucid_agnesi
+
+
+======================================================================================
+
+docker run:
+
+$ docker run hello-world
+pull and starts new container
+
+******************************
+
+$ docker run --name python-c1 python:3.9-slim 
+
+this will run `python:3.9-slim` image with the given name `python-c1`
+
+******************************
+
+$ docker run --name python-c2 -d python:3.9-slim 
+
+-d flag = Run container in background and print container ID
+
+Note: we can't create two containers with same name
+
+******************************
+
+
+$ docker run --name python-c3 -it python:3.9-slim 
+
+Python 3.9.19 (main, Aug 13 2024, 01:15:04) 
+[GCC 12.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> print("Hello world")
+Hello world
+>>> exit()
+
+-it = run in interactive terminal mode
+
+
+******************************
+
+$ docker run --name python-c2 -it -d python:3.9-slim 
+
+-it = run in interactive terminal mode
+
+$ docker ps -a
+
+CONTAINER ID   IMAGE             COMMAND     CREATED         STATUS                   PORTS     NAMES
+ba2b3f1f744c   python:3.9-slim   "python3"   3 seconds ago   Up 2 seconds                       python-c2
+
+******************************
+
+$ docker run --name python-c5 -it --rm python:3.9-slim 
+
+--rm = Automatically remove the container and its associated anonymous volumes when it exits
+
+======================================================================================
+
+docker exec:
+
+Description:  Execute a command in a running container ( can only used with containers that are running )
+Usage:	      docker container exec [OPTIONS] CONTAINER COMMAND [ARG...]
+
+$ docker ps -a
+
+CONTAINER ID   IMAGE             COMMAND     CREATED          STATUS                      PORTS     NAMES
+ba2b3f1f744c   python:3.9-slim   "python3"   37 minutes ago   Up 4 minutes                          python-c2
+
+$ docker exec -it python-c2 python
+
+Python 3.9.19 (main, Aug 13 2024, 01:15:04) 
+[GCC 12.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> print("Hello World!")
+Hello World!
+
+**************************
+
+Check the virtual file system or configurations of the running container
+
+$ docker exec -it <id_of_container> /bin/bash          -- it for interactive terminal
+* ls
+* cd /
+* ls
+* env
+
+======================================================================================
+
+docker inspect:
+
+Description:	Return low-level information on Docker objects
+Usage:      	docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+$ docker inspect python-c2
+
+[
+    {
+        "Id": "ba2b3f1f744ca7de31e9d24e10fe85556ada5ca0d5d1533ab409a8d362c496e5",
+        "Created": "2024-08-17T17:12:28.781970927Z",
+        "Path": "python3",      
+        "Config": {
+            "Hostname": "ba2b3f1f744c",
+            "Env": [],
+            "Cmd": [
+                "python3"
+            ]
+        },
+        "NetworkSettings": {
+            ...
+        }
+    }
+]
+
+======================================================================================
+
+Restart container:
+
+docker stop <id_of_container>                ---- we can also use name of the container
+docker start <id_of_container>
+docker restart <id_of_container>
+
+$ docker ps
+CONTAINER ID   IMAGE             COMMAND     CREATED          STATUS          PORTS     NAMES
+ba2b3f1f744c   python:3.9-slim   "python3"   29 minutes ago   Up 29 minutes             python-c2
+
+$ docker stop python-c2
+python-c2
+
+$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+$ docker start python-c2
+
+======================================================================================
+
+Remove container:
+
+docker rm:
+
+Remove container (stop the container before removing or force remove)
+
+$ docker rm python-c1
+
+$ docker rm python-c2 -f
+force remove a running container
+
+
+======================================================================================
+
+Remove image: (docker rmi)
+
+$ docker images
+REPOSITORY    TAG        IMAGE ID       CREATED         SIZE
+python        3.9-slim   d8892906392f   2 weeks ago     125MB
+hello-world   latest     d2c94e258dcb   15 months ago   13.3kB
+
+
+$ docker rmi hello-world
+Error response from daemon: conflict: unable to remove repository reference "hello-world" (must force) - container 973a3e5ef556 is using its referenced image d2c94e258dcb
+
+To remove an image, we first need to remove all the containers of that image.
+
+**********************
+
+$ docker rmi python
+or
+$ docker rmi d8892906392f
+
+
+======================================================================================
+
+Remove all stopped containers
+
+$ docker container prune
+
+WARNING! This will remove all stopped containers.
+Are you sure you want to continue? [y/N] y
+
+======================================================================================
+
+Environment Variabel in mysql container:
+
+https://hub.docker.com/_/mysql
+
+$ docker pull mysql
+
+**********************
+
+$ docker images
+
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+mysql        latest    7ce93a845a8a   3 weeks ago   586MB
+
+**********************
+
+Run mysql image with the name `mysql-c1` with environment variable MYSQL_ROOT_PASSWORD in detached mode:
+
+$ docker run --name mysql-c1 -e MYSQL_ROOT_PASSWORD=nouman -d mysql
+
+22ac342747123211ac1d3c3804a6834a41df96ee17598ed50dcfb1df2a73b75b
+
+$ docker ps -a
+
+CONTAINER ID   IMAGE     COMMAND                  CREATED              STATUS              PORTS                 NAMES
+22ac34274712   mysql     "docker-entrypoint.s…"   About a minute ago   Up About a minute   3306/tcp, 33060/tcp   mysql-c1
+
+**********************
+
+Execute command `mysql -u root -p` in the container `mysql-c1`: 
+
+$ docker exec -it mysql-c1 mysql -u root -p
+
+Enter password: nouman
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 9.0.1 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
+
+**********************
+
+$ docker stop mysql-c1
+
+**********************
+
+We can also start mysql shell like this:
+
+$ docker start mysql-c1 
+mysql-c1
+
+$ docker exec -it mysql-c1 /bin/bash
+
+bash-5.1# mysql -u root -p
+Enter password: nouman 
+
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+
+mysql> 
+
+======================================================================================
+https://docs.docker.com/guides/docker-concepts/running-containers/publishing-ports/
+
+Exposing Port ( Binding container and host )
+
+Usage: docker run -p host_port:container_port -d image_name
+
+
+$ docker run -p 6000:6379 -d redis
+
+It connects my localhost(my-system) port 6000  to the  port 6379 inside my container.
+This means that when we hit 6000 port on host, then it will hit on port 6379 of the container.
+
+**********************************
+
+We can also attach another redis container:
+
+$ docker run -p 6001:6379 -d redis:4.0
+
+Container can run on same port but we should have host bingding port different.
+
+**********************************
+
+HOST_PORT: The port number on your host machine where you want to receive traffic
+CONTAINER_PORT: The port number within the container that's listening for connections
+
+**********************************
+
+Run apache and nginx both:
+
+$ docker run --name nginx-c1 -p 8080:80 -d nginx
+
+$ docker run --name apache-c1 -p 8000:80 -d httpd:alpine
+
+======================================================================================
+
+Debugging container
+
+1)
+$ docker logs <id_of_container>
+$ docker logs <id_of_container> | tail       -- to see last part of logs only
+$ docker logs <id_of_container> -f           -- now you can string the logs ( add line manualy to separate )
+
+2) create a new container with given name
+
+docker run -d -p 6001:6379 --name redis-older redis:4.0
+docker run -d -p 6000:6379 --name redis-latest redis
+
+docker logs redis-older
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
+
+======================================================================================
+
