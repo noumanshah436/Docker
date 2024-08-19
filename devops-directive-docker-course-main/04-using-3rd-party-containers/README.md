@@ -144,6 +144,11 @@ cat my-data/hello.txt # Produces error: `cat: my-data/hello.txt: No such file or
 #### i. Volume Mounts
 We can use volumes and mounts to safely persist the data.
 
+General syntax:
+```
+docker run -it --rm -v <volume-name>:<container-path> <image-name>
+```
+
 ```bash
 # create a named volume
 docker volume create my-volume
@@ -193,6 +198,11 @@ docker run -it --rm -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=foob
 #### ii. Bind Mounts
 
 Alternatively, we can mount a directory from the host system using a bind mount:
+
+General syntax:
+```
+docker run -it --rm -v <host-path>:<container-path> <image-name>
+```
 
 ```bash
 # Create a container that mounts a directory from the host filesystem into the container

@@ -15,6 +15,11 @@ Remove all stopped containers
 Environment Variabel in mysql container
 Exposing Port 
 Debugging container
+Docker Volume
+    Share data between host and container (Bind Mount)
+    Share data between multiple containers (Volume Mount)
+    Volume with Dockerfile
+
 
 ======================================================================================
 Links:
@@ -22,9 +27,11 @@ Links:
 
 https://docs.docker.com/reference/cli/docker/image/ls/
 
+*************************
 
 https://www.youtube.com/watch?v=Qn08jgrsRY4&list=PLbGui_ZYuhihMb5pqut64GhW-WhxKpygY&index=5&t=2448s
-1:003
+
+2:00:00
 
 ======================================================================================
 
@@ -155,13 +162,18 @@ Hello World!
 
 **************************
 
-Check the virtual file system or configurations of the running container
+The below command opens an interactive Bash shell inside the running python-c1 container, 
+allowing you to interact with the container as if you were inside its terminal.
 
-$ docker exec -it <id_of_container> /bin/bash          -- it for interactive terminal
-* ls
-* cd /
-* ls
-* env
+We can check the virtual file system or configurations of the running container
+
+$ docker exec -it python-c1 bin/bash
+
+root@e9dfefa45be0:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+
+root@e9dfefa45be0:/# python --version
+Python 3.12.5
 
 ======================================================================================
 
@@ -375,7 +387,132 @@ docker run -d -p 6000:6379 --name redis-latest redis
 docker logs redis-older
 
 ======================================================================================
+Docker Volume
+======================================================================================
 
+### What is Docker Volume
+- Docker Volume is a feature provided by Docker that allows you to manage persistent data in Docker containers.
+- Containers run in an isolated environment with their own file system.
+- Data stored within a container is typically non-persistent and is lost when the container is stopped or removed.
+- Docker Volumes allow for persistent storage that can be shared between containers or between a container and the host system.
+- Volumes ensure that data persists even if the container is stopped or deleted.
+
+### What is Docker Volume (Continued)
+- A Docker Volume is a directory or mount point outside the container's file system, mapped to a specific path within the container.
+- This mapping enables the container to read from or write to the volume as if it were a regular directory.
+- Docker volumes are created separately from the container and can be mounted to one or more containers.
+- They are independent and can be associated with one or more containers.
+
+### Advantages of Docker Volume
+- Easier to back up or migrate than bind mounts.
+- Managed using Docker CLI commands or the Docker API.
+- Compatible with both Linux and Windows containers.
+- Can be safely shared among multiple containers.
+- Volume drivers allow storing volumes on remote hosts or cloud providers, encrypting contents, or adding functionality.
+- New volumes can have their content pre-populated by a container.
+- Volumes on Docker Desktop have higher performance than bind mounts from Mac and Windows hosts.
+
+### Docker Volume Commands
+- `docker volume create volume_name`                                            ->  Creates a volume.
+- `docker volume ls`                                                            ->  Lists volumes.
+- `docker volume inspect volume_name`                                           ->  Inspects a volume.
+- `docker volume rm volume_name`                                                ->  Removes a volume.
+- `docker volume prune`                                                         ->  Removes all volumes.
+- `docker run -d --name container_name -v volume_name:/app nginx`               ->  Starts a container and creates a volume if it doesn't exist.
+- `docker run -d --name container_name -v volume_name:/app:ro nginx`            ->  Starts a container and creates a read-only volume if it doesn't exist.
+
+********************************************************************
+### Share data between host and container (Bind Mount)
+********************************************************************
+
+(Mount host directory to the container directory)
+
+We can share data between host to container without creating docker volume by directly mounting host directory to container directory.
+
+
+$ cd my-site
+$ docker run --name python-c1 -it -d -v /home/dev/Docker/full-course/docker-volume/my-site:/my-app python
+
+This will mount our local `/home/dev/Docker/full-course/docker-volume/my-site` directory to `/my-app` directory inside the container 
+(it will create /my-app directory inside the container and mount with our local dir)
+
+$ docker exec -it python-c1 bash
+
+# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  my-app  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+
+# cd my-app/
+
+# ls
+hello.py
+
+# python hello.py 
+Hello world!
+
+********************************************************************
+### Share data between multiple containers (Volume Mount)
+********************************************************************
+
+To share a vlume between two docker containers, you can create a docker volume and the mount it to both containers
+
+Create volume then mount to container:
+
+$ docker volume create myvolume
+$ docker run --name c1 -itd -v myvolume:/myapp python
+$ docker run --name c2 -itd -v myvolume:/myapp python
+
+This creates a Docker volume (myvolume) and then mounts it to the /myapp directory in two separate containers (c1 and c2), 
+allowing both containers to share data via the same volume.
+
+If we now interact(using below command)s with both the containers in a separate terminal, we will see a myapp folder inside both containers and any change in that folder will reflect on both the containers.
+
+$ docker exec -it c1 /bin/bash
+$ docker exec -it c2 /bin/bash
+
+Removing the container will not remove the volume data, we can mount new container with that volume.
+
+********************************************************************
+### Volume with Dockerfile:
+********************************************************************
+
+To use a volume with a Dockerfile, you can define the `VOLUME` instruction within the Dockerfile. 
+This instruction creates a mount point with a specified path inside the container that can later be mapped to a volume.
+
+Here's a simple example:
+
+### docker-volume/volume-with-dockerfile/Dockerfile
+
+```
+# Use a base image
+FROM ubuntu
+
+# Define a volume
+VOLUME ["/nouman-data"]
+```
+
+### Explanation:
+
+- VOLUME ["/nouman-data"]
+
+This defines `/nouman-data` as a mount point that can be backed by a Docker volume. 
+When you run the container, you can map this to a Docker-managed volume or a specific host directory.
+
+### Running the Docker Container with a Volume:
+
+After building the Docker image using the Dockerfile, you can run multiple container and map a volume to the defined path.
+If the volume `myvolume` does not already exist, Docker will automatically create it when you run the command.
+
+$ cd "docker-volume/volume-with-dockerfile"
+$ docker build -t my-image .
+$ docker run --name my-container-1 -itd -v myvolume:/nouman-data my-image /bin/bash
+$ docker run --name my-container-2 -itd -v myvolume:/nouman-data my-image /bin/bash
+
+Check volume:
+$ docker exec -it my-container-1 bash                          -- go to nouman-data and create some file or folder
+$ docker exec -it my-container-2 bash                          -- here in the nouman-data folder, you will find the above created file or folder
+
+In this example:
+- `myvolume:/nouman-data`: Maps the `myvolume` Docker volume to the `/nouman-data` directory inside the container.
 
 ======================================================================================
 
