@@ -19,7 +19,8 @@ Docker Volume
     Share data between host and container (Bind Mount)
     Share data between multiple containers (Volume Mount)
     Volume with Dockerfile
-
+Docker Networking
+Docker Compose
 
 ======================================================================================
 Links:
@@ -206,7 +207,7 @@ $ docker inspect python-c2
 
 Restart container:
 
-docker stop <id_of_container>                ---- we can also use name of the container
+docker stop <id_of_container or list-of-ids>                ---- we can also use name of the container
 docker start <id_of_container>
 docker restart <id_of_container>
 
@@ -221,6 +222,15 @@ $ docker ps
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
 $ docker start python-c2
+
+We can also use:
+docker container stop <id_of_container>
+docker container start <id_of_container>
+docker container restart <id_of_container>
+
+
+docker stop c1 c2 c3 c4
+
 
 ======================================================================================
 
@@ -515,9 +525,345 @@ In this example:
 - `myvolume:/nouman-data`: Maps the `myvolume` Docker volume to the `/nouman-data` directory inside the container.
 
 ======================================================================================
+Docker Networking
+======================================================================================
+
+
+What is Docker Networking
+
+Docker networking is a fundamental aspect of Docker that enables communication between Docker containers and external networks. It allows you to connect containers together, as well as connect containers to the host machine and other external resources.
+A container has no information about what kind of network it's attached to, or whether their peers are also Docker workloads or not.
+A container only sees a network interface with an IP address, a gateway, a routing table, DNS services, and other networking details.
+By default, when you create or run a container using docker create or docker run, the container doesn't expose any of its ports to the outside world.
+Use the --publish or -p flag to make a port available to services outside of Docke This creates a firewall rule in the host, mapping a container port to a port on the Docker host to the outside world.
+
+*****************************************
+
+Network Drivers:
+
+bridge:
+The default bridge network is good for running containers that don't require special networking capabilities. 
+User-defined bridge networks enable containers on the same Docker host to communicate with each other. 
+A user-defined network typically defines an isolated network for multiple containers belonging to a common project or component.
+
+host:
+Host network shares the host's network with the container. 
+When you use this driver, the container's network isn't isolated from the host.
+
+overlay:
+Overlay networks are best when you need containers running on different Docker hosts to communicate, or when multiple applications work together using Swarm services.
+
+macvlan:
+Macvlan networks are best when you are migrating from a VM setu or need your containers to look like physical hosts on your network, each with unique MAC address.
+
+ipvlan:
+IPvlan is similar to Macvlan, but doesn't assign unique MAC addresses to containers. Consider using IPvlan when there's a restriction on the number of MAC addresses that can be assigned to a network interface or port.
+
+none:
+No Networking
+
+Network plugins
+
+
+*****************************************
+
+Bridge Network Drivers:
+
+In terms of Docker, a bridge network uses a software bridge which allows containers connected to the same bridge network to communicate, while providing isolation from containers which are not connected to that bridge network.
+The Docker bridge driver automatically installs rules in the host machine so that containers on different bridge networks cannot communicate directly with each other.
+Bridge networks apply to containers running on the same Docker daemon host.
+When you start Docker, a default bridge network (also called bridge) is created automatically, and newly-started containers connect to it unless otherwise specified
+
+
+
+Default Bridge Network: 
+
+Containers can communicate to each other 
+Container and Host can communicate via bridge 
+Containers can only communicate by IP address, not by container name.
+
+
+User-defined Bridge Network:
+
+Possible to achieve isolation of container.
+C1 and C2 can communicate to each other and to Host via bridge default.
+C3 can't communicate to C1 and C2 but can communicate to Host via bridge netl 
+Containers can communicate by IP address & also resolve a container name to an IP address. 
+This capability called automatic service discovery.
+
+*****************************************
+
+Networking Commands
+
+docker network ls 
+- It is used to list all networks. bridge is the default network.
+
+docker network inspect bridge 
+– It is used to inspect bridge network to see what containers are connected to it.
+
+docker network create --driver bridge network_name 
+- It is used to create user-defined bridge network.
+
+docker network inspect network_name 
+– It is used to inspect network.
+
+docker run --name container_name -itd --network network_name alpine 
+- It is used to connect a container to a specified network e.g. host, user-defined bridge.
+
+docker network connect container_name network_name 
+- It is used to connect a running container to an existing user-defined bridge.
+
+• docker network disconnect container_name network_name 
+– It is used to disconnect a running container to an existing user-defined bridge.
+
+docker network rm network_name 
+– It is used delete specified network.
+
+
+**********************************************************************************
+Practical:
+
+alpine
+A minimal Docker image based on Alpine Linux with a complete package index and only 5 MB in size!
+
+$ docker pull alpine
+
+$ docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+6ed0a8e10ade   bridge    bridge    local
+c39746358760   host      host      local
+cfb47357c8f6   none      null      local
+
+$ docker network inspect bridge
+
+$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+alpine       latest    324bc02ae123   4 weeks ago   7.8MB
+
+***************************************************************
+Deafult bridge network: 
+
+$ docker run --name c1 -it -d alpine ash
+c4b16951dda620765760da9319fa1de1db6697051ef339b3557c776223312433
+
+$ docker run --name c2 -it -d alpine ash
+6032846dc800bcefa27eac287f45c0fba64300b2a78b99a7e3a3272ef63e90e5
+
+This will container two containers c1 and c2 from alpine image with ash (like bin/bash) terminal.
+By default this will attach to the bridge network. 
+
+Inspect bridge network to check if c1 and c2 are attached to this bridge network.
+$ docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        ....
+        "Containers": {
+            "6032846dc800bcefa27eac287f45c0fba64300b2a78b99a7e3a3272ef63e90e5": {
+                "Name": "c2",
+                "EndpointID": "9becc7aaa7897b093ada3ee63984f0f92d1708392004f7bcc1772abf52783269",
+                "MacAddress": "02:42:ac:11:00:03",
+                "IPv4Address": "172.17.0.3/16",
+                "IPv6Address": ""
+            },
+            "c4b16951dda620765760da9319fa1de1db6697051ef339b3557c776223312433": {
+                "Name": "c1",
+                "EndpointID": "03dfcabae02fc86af501bf290189bc8ee395589738e663d009af7ba06fd4ba06",
+                "MacAddress": "02:42:ac:11:00:02",
+                "IPv4Address": "172.17.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        ...
+    }
+]
+
+*********************
+
+Now attch to container c1
+
+$ docker attach c1
+
+# ip addr show
+17: eth0@if18: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+
+As c1 is connected with bridge network that can communicate with host network, and can use same host network:
+# ping -c 5 google.com
+
+C1 container can also communicate with c2 container by its ip address ( not with container name ) :
+# ping -c 5 172.17.0.3
+PING 172.17.0.3 (172.17.0.3): 56 data bytes
+64 bytes from 172.17.0.3: seq=0 ttl=64 time=0.197 ms
+64 bytes from 172.17.0.3: seq=1 ttl=64 time=0.186 ms
+64 bytes from 172.17.0.3: seq=2 ttl=64 time=0.138 ms
+64 bytes from 172.17.0.3: seq=3 ttl=64 time=0.144 ms
+64 bytes from 172.17.0.3: seq=4 ttl=64 time=0.138 ms
+
+--- 172.17.0.3 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 0.138/0.160/0.197 ms
+
+***************************************************************
+
+Create custom bridge network and attach container to it:
+
+$ docker network create --driver bridge net1 
+992d54ab36ee37d6239d0ef48119f734383f2c242e706b91c9227593a03458cf
+
+Attach container c3 of alpine image with our network `net1`
+$ docker run --name c3 -itd --network net1 alpine ash
+fb6d75fe2de3b7b2e9ae05d6cb994f8fbf1d5b396cff86ea81d8ab03ab82491d
+
+$ docker run --name c4 -itd --network net1 alpine ash
+ecc965c0d10eae20b597e1481b58333690ceec9a245563efba2ce9eb22bcef2a
+
+
+Inspect bridge network to check if c3 and c4 are attached to this custom bridge network.
+$ docker network inspect net1
+[
+    {
+        "Name": "net1",
+        ...,
+        "Containers": {
+            "ecc965c0d10eae20b597e1481b58333690ceec9a245563efba2ce9eb22bcef2a": {
+                "Name": "c4",
+                "EndpointID": "7b3cf23b1dd0be35e06193d4e9c2742741bd933b2eff3f25ef55778e277c8a01",
+                "MacAddress": "02:42:ac:12:00:03",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            },
+            "fb6d75fe2de3b7b2e9ae05d6cb994f8fbf1d5b396cff86ea81d8ab03ab82491d": {
+                "Name": "c3",
+                "EndpointID": "0e40aca017df6326806a3e2ed31e8e5f43b3fccce2be7fe77fc9f7db5bddd0a0",
+                "MacAddress": "02:42:ac:12:00:02",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        ...
+    }
+]
+
+
+*********************
+
+Now attch to container c3
+
+$ docker attach c3
+
+# ip addr show
+24: eth0@if25: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:12:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 172.18.0.2/16 brd 172.18.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+
+
+C3 container can also communicate with c4 container by its ip address or by name:
+
+# ping -c 5 172.18.0.3
+
+PING 172.18.0.3 (172.18.0.3): 56 data bytes
+64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.233 ms
+64 bytes from 172.18.0.3: seq=1 ttl=64 time=0.136 ms
+64 bytes from 172.18.0.3: seq=2 ttl=64 time=0.133 ms
+64 bytes from 172.18.0.3: seq=3 ttl=64 time=0.139 ms
+64 bytes from 172.18.0.3: seq=4 ttl=64 time=0.139 ms
+
+--- 172.18.0.3 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 0.133/0.156/0.233 ms
+
+
+# ping -c 5 c4
+
+PING c4 (172.18.0.3): 56 data bytes
+64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.123 ms
+64 bytes from 172.18.0.3: seq=1 ttl=64 time=0.139 ms
+64 bytes from 172.18.0.3: seq=2 ttl=64 time=0.137 ms
+64 bytes from 172.18.0.3: seq=3 ttl=64 time=0.175 ms
+64 bytes from 172.18.0.3: seq=4 ttl=64 time=0.141 ms
+
+--- c4 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 0.123/0.143/0.175 ms
+
+Summary:
+
+containers c1 and c2 are attached with default bridge network and 
+containers c3 and c4 are attached with our custom bridge network (net1).
+
+C1 and C2 can communicate with each other by their ip address only.
+C3 and C4 can communicate with each other by their ip address or by name.
+
+Both these bridges are isolated from each other and cannot communicate with each other.
 
 
 ======================================================================================
+Docker Compose
+======================================================================================
+
+$ docker compose version
+$ docker compose --help
+
+Docker Compose:
+
+
+### Docker Compose  
+* Compose is a tool for defining and running multi-container Docker applications. 
+* With Compose, you use a YAML file to configure your application's services. Then, with a single command, you create and start all the services from your configuration. 
+* Compose works in all environments: production, staging, development, testing, as well as CI workflows.
+
+*******************************
+
+**Docker Desktop** includes Docker Compose along with Docker Engine and Docker CLI, which are Compose prerequisites.
+
+#### Following are the use cases of Docker Compose:
+- Development environments
+- Automated testing environments
+- Single host deployments
+
+*******************************
+
+### Docker Compose Key Features
+- Have multiple isolated environments on a single host.
+- Preserves volume data when containers are created.
+- Only recreates containers that have changed.
+- Supports variables and moving a composition between environments.
+
+*******************************
+
+### Example of `docker-compose.yml`
+```yaml
+services:
+  web:
+    image: "nginx"
+  redis:
+    image: "redis:6.0-alpine3.18"
+```
+
+*******************************
+
+### Commands
+- **`docker compose --help`**  
+  This command is used to see other available commands.
+
+- **`docker compose up`**  
+  This command will take the `docker-compose.yml` file and start building containers. It will download/pull required images and create/start the necessary containers. If we modify the `docker-compose.yml` file and run `docker compose up` again, it will only recreate modified containers.
+
+- **`docker compose up -d`**  
+  Same as `docker compose up` but runs in the background, which means it won't occupy the terminal.
+
+- **`docker compose ps`**  
+  This command is used to list currently running services.
+
+- **`docker compose exec service_name mysql -u root -p`**  
+  This command is used to access the terminal of a container.
+
+- **`docker compose stop`**  
+  This command is used to stop services started using `docker compose up -d`.
 
 
 ======================================================================================

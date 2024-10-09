@@ -1,0 +1,94 @@
+
+
+
+1) create dockerfile for django project
+
+2) create docker compose file with all required services
+
+
+ports:
+    - "host:container"
+
+*************************************
+
+Commands
+
+1) Start creating containers
+$ docker compose -f docker-compose.dev.yml up -d 
+
+
+2) Remove all containers/services
+$ docker compose -f docker-compose.dev.yml down
+
+3) 
+list currently running services.
+$ docker compose -f docker-compose.dev.yml ps
+
+use -a flag to show all running or stopped services:
+$ docker compose -f docker-compose.dev.yml ps -a     
+
+
+4) see logs of services:
+
+This will show logs of `mysql_db` service
+$ COMPOSE_FILE=docker-compose.dev.yml docker compose logs mysql_db
+
+This will show logs of `django_project` service
+$ COMPOSE_FILE=docker-compose.dev.yml docker compose logs django_project
+
+
+*************************************
+
+Execute commands inside containers:
+
+
+1) run commands in mysql_db:
+
+$ COMPOSE_FILE=docker-compose.dev.yml docker compose exec mysql_db mysql -u root -p
+Enter password: root
+
+Note: We can also run `mysql -u root -p` directly in docker desktop terminal for this service.
+
+2) open django shell:
+
+$ COMPOSE_FILE=docker-compose.dev.yml docker compose exec django_project python manage.py shell
+
+Python 3.12.7 (main, Oct  1 2024, 22:28:30) [GCC 12.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+(InteractiveConsole)
+>>> from blog.models import Post
+>>> Post.objects.all()
+>>> exit()
+
+*************************************
+
+Open project:
+
+
+1) phpmyadmin:
+
+http://localhost:8080/
+
+username: nouman
+pass: Hello123456
+
+2) django project:
+
+http://localhost:8000/
+
+
+*************************************
+
+Errors:
+
+1) Mysql service port issue:
+
+Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:3306 -> 0.0.0.0:0: listen tcp 0.0.0.0:3306: bind: address already in use
+
+SOl: I changed the port from 3306 to 3307 of host
+
+2) Django project service:
+
+2024-10-09 19:16:13 django.db.utils.OperationalError: (2002, "Can't connect to server on 'mysql_db' (115)")
+
+sol: just re-run the service.

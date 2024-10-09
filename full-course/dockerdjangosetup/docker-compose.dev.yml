@@ -1,0 +1,52 @@
+services:
+  # MySQL Database Service
+  mysql_db:
+    container_name: mysql_con # Sets a custom container name for the MySQL service.
+    image: mysql # Uses the official MySQL image from Docker Hub.
+    restart: always # Ensures the container restarts automatically if it crashes.
+    ports:
+      - "3307:3306" # Exposes port 3307 on the host machine and maps it to port 3306 in the container (MySQL default port).
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=newdb
+      - MYSQL_USER=nouman
+      - MYSQL_PASSWORD=${DB_PASS} # Referencing the variable from the .env file 
+    volumes:
+      - ./mysql_data:/var/lib/mysql # Persists MySQL data in the 'mysql_data' folder on the host, ensuring data persists across container restarts.
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"] # Health check command to verify if MySQL is up and running.
+      interval: 10s # Interval between health checks.
+      timeout: 10s # Timeout for each health check.
+      retries: 5 # Number of retries before considering the service as unhealthy.
+      start_period: 30s # Wait time before the first health check after the container starts.
+
+  # phpMyAdmin Service (phpMyAdmin is a tool for MySQL management via a web interface)
+  phpmyadmin:
+    container_name: phpmyadmin_con # Sets a custom container name for phpMyAdmin.
+    image: phpmyadmin # Uses the official phpMyAdmin image from Docker Hub.
+    restart: always # Ensures the container restarts automatically if it crashes.
+    ports:
+      - "8080:80" # Exposes port 8080 on the host and maps it to port 80 in the container (phpMyAdmin default port).
+    environment:
+      PMA_HOST: mysql_db # Tells phpMyAdmin to connect to the MySQL service (`mysql_db`).
+      MYSQL_ROOT_PASSWORD: root # Passes the MySQL root password for authentication.
+    depends_on:
+      - mysql_db # Ensures that phpMyAdmin starts only after the MySQL service is up and running.
+
+  # Django Project Service
+  django_project:
+    container_name: django_con # Sets a custom container name for the Django service.
+    image: django-img # Uses a custom image for Django (needs to be built from the provided Dockerfile).
+    build:
+      context: . # Sets the build context to the current directory.
+      dockerfile: Dockerfile.dev # Specifies the Dockerfile to be used for building the Django image.
+    ports:
+      - "8000:8000" # Exposes port 8000 on the host machine and maps it to port 8000 in the container (Django default port).
+    env_file:
+      - ".env" # Loads environment variables from the `.env` file located in the current directory.
+    volumes:
+      - .:/dockerdjangosetup # Mounts the current directory (on host) as a volume in the container, allowing live changes during development.
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      mysql_db:
+        condition: service_healthy # Ensures that Django starts only after MySQL is healthy.

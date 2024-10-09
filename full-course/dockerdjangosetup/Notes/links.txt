@@ -1,0 +1,3 @@
+Setup Django MySQL phpmyadmin Development Docker Environment
+
+https://www.youtube.com/watch?v=1rFHJFcp4Nk&list=PLbGui_ZYuhihMb5pqut64GhW-WhxKpygY&index=9
