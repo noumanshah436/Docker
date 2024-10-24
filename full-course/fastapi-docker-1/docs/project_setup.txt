@@ -1,0 +1,110 @@
+SetuS project locally:
+
+.
+├── app
+│   ├── __init__.py
+│   └── main.py
+├── Dockerfile
+└── requirements.txt
+
+python -m venv venv
+source venv/bin/activate
+pip install fastapi uvicorn
+
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+or 
+uvicorn app.main:app --host localhost --port 8000
+
+
+http://0.0.0.0:8000/docs
+http://localhost:8000/docs
+
+*************************************
+
+Summary: (0.0.0.0  vs localhost)
+
+--host 0.0.0.0: Makes the app accessible from any network interface (external access).
+--host localhost: Restricts the app to be accessible only from the local machine.
+
+In Docker, you almost always need to use 0.0.0.0 so the app can be accessed from outside the container.
+
+*************************************
+Dockerize fastapi app
+*************************************
+
+- Create Dockerfile
+
+- Build your FastAPI image:
+
+$ docker build -t fastapi-image .
+
+Notice the . at the end, it's equivalent to ./, it tells Docker the directory to use to build the container image.
+In this case, it's the same current directory (.).
+
+*************************************
+
+Run a container based on your image:
+
+1) first way:
+Run in detached mode
+$ docker run -d --name mycontainer -p 8000:8000 fastapi-image
+
+
+2) 2nd way
+
+bash ->  Open a bash terminal inside container once it start.
+--rm ->  flag to remove the container once it exit.
+
+$ docker run --rm -it -p 8000:8000 fastapi-image bash
+
+root@ccdacd663469:/code# ls
+app  requirements.txt 
+
+We can also run our project directly from this container bash shell:
+
+root@ccdacd663469:/code# uvicorn app.main:app --host=0.0.0.0
+INFO:     Started server process [9]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     172.17.0.1:64722 - "GET / HTTP/1.1" 200 OK
+INFO:     172.17.0.1:64722 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:64746 - "GET / HTTP/1.1" 200 OK
+INFO:     172.17.0.1:64746 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     172.17.0.1:64746 - "GET /docs HTTP/1.1" 200 OK
+INFO:     172.17.0.1:64746 - "GET /openapi.json HTTP/1.1" 200 OK
+
+
+Go to http://0.0.0.0:8000/docs or http://localhost:8000/docs on your host machine:
+
+
+press ctrl+D to get out of the container
+
+*************************************
+
+remove image
+
+$ docker rmi fastapi-image
+
+*************************************
+
+dockerignore:
+
+create dockerignore file and add dir or files that you do not want to copy to the container.
+
+That will be needed if we do like `Copy . .` in docker file.
+
+But nn this current setup, we are precisely copying files to the container. 
+
+*************************************
+
+We can also create docker compose file so that we do not need to specify things manually. 
+
+$ docker compose up -d
+
+Go to http://0.0.0.0:8000/docs or http://localhost:8000/docs on your host machine:
+
+
+If we change dockerfile now, we should use --build flag, so that it recreates the image.
+
+*************************************

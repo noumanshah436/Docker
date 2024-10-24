@@ -1,0 +1,21 @@
+
+FastAPI in Containers - Docker
+https://fastapi.tiangolo.com/deployment/docker/#create-the-fastapi-code
+
+
+********************************
+
+Dockerize fastapi app - Python Framework inside docker container
+https://www.youtube.com/watch?v=ED6PRjmXgBA&t=6s
+
+
+*******************************
+
+
+Another way to dockerize fastapi
+
+Dockerize FastAPI project like a pro - Step-by-step Tutorial
+
+https://dev.to/rajeshj3/dockerize-fastapi-project-like-a-pro-step-by-step-tutorial-7i8
+
+*******************************

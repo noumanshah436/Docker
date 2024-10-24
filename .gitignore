@@ -3,6 +3,8 @@
 # dependencies
 node_modules
 go-workspace
+venv
+.venv
 
 .pnp.js
 
@@ -53,3 +55,5 @@ bin/
 # Dependency directories
 go.sum
 go.mod
+
+__pycache__
