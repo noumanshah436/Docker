@@ -1,0 +1,1 @@
+https://dev.to/devasservice/the-cheap-way-how-to-use-docker-to-deploy-your-fastapi-kmn
