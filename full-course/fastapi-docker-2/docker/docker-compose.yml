@@ -1,0 +1,9 @@
+services:
+  web:
+    build:
+      context: ../app  # Updated to point to the app folder where the Dockerfile is
+      dockerfile: Dockerfile  # Use the Dockerfile from the app directory
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../app:/code/app  # Updated volume path to mount the app folder

@@ -1,0 +1,20 @@
+context specifies the folder where Docker will look for everything related to the build (including the Dockerfile).
+
+
+**********************************************
+
+build:
+  context: ../app  # Since Dockerfile is named "Dockerfile", this alone works
+
+
+Since the build context is ../app, Docker automatically looks for the Dockerfile there.
+
+**********************************************
+
+If your Dockerfile has a non-standard name (e.g., Dockerfile.prod), you would explicitly specify it:
+
+build:
+  context: ../app
+  dockerfile: Dockerfile.prod
+
+**********************************************

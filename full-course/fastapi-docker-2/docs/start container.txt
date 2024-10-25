@@ -1,0 +1,17 @@
+New Directory Structure
+
+
+project_root/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   └── Dockerfile
+|   └── requirements.txt
+└── docker/
+    └── docker-compose.yml
+
+
+
+
+docker compose -f docker/docker-compose.yml up --build
+

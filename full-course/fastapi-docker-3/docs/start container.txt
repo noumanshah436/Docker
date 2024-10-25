@@ -1,0 +1,46 @@
+New local Directory Structure
+
+
+.
+├── docker
+│   └── docker-compose.yml
+├── docs
+│   ├── docker-dir-issue.md
+│   ├── dockerfile compose detail.txt
+│   ├── optimize dockerization.md
+│   └── start container.txt
+└── my-project
+    ├── app
+    │   └── service
+    │       ├── __init__.py
+    │       ├── main.py
+    │       └── requirements.txt
+    ├── Dockerfile
+
+
+*********************************
+
+start container:
+
+docker compose -f docker/docker-compose.yml up --build
+
+http://0.0.0.0:8000/docs
+or 
+http://localhost:8000/docs
+
+
+***********************************
+
+Folder structure inside docker container:
+
+
+└── code
+    ├── app
+    │   └── service
+    │       ├── __init__.py
+    │       ├── main.py
+    │       └── requirements.txt
+
+
+
+*********************************
